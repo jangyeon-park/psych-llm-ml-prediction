@@ -1,0 +1,40 @@
+# Data (EMR data cannot be shared publicly)
+*.csv
+data/
+results/
+
+# Original (unrefactored) notebooks
+260116_*.ipynb
+LLM_output_preprocessing.ipynb
+
+# Paper
+*.docx
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# CatBoost auto-generated
+catboost_info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Environment
+.env
+*.pkl
