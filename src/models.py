@@ -220,11 +220,3 @@ def get_models_search_unweighted():
             },
         ),
     }
-
-
-def to_bayes_space(grid_dict):
-    """
-    Convert a grid dict (dict of lists) to BayesSearchCV search_spaces
-    (dict of skopt Categorical spaces).
-    """
-    return {k: Categorical(v) for k, v in grid_dict.items()}
