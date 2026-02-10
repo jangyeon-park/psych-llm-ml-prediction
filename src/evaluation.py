@@ -204,3 +204,86 @@ def decision_curve(y_true, y_prob, thresholds=None):
         nb = (tp / N) - (fp / N) * (th / (1 - th))
         out.append((th, nb))
     return pd.DataFrame(out, columns=["threshold", "net_benefit"])
+
+
+# ─── Plot Utilities ───
+
+def plot_roc_curve(y_true, y_prob, title="ROC Curve", threshold_markers=None):
+    """Plot ROC curve with optional threshold markers.
+
+    Parameters
+    ----------
+    threshold_markers : list of dict, optional
+        Each dict has keys 'thr', 'label'. The corresponding (FPR, TPR)
+        point is plotted on the curve.
+
+    Returns matplotlib Figure.
+    """
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import roc_auc_score
+
+    fpr, tpr, thresholds = roc_curve(y_true, y_prob)
+    auc_val = roc_auc_score(y_true, y_prob)
+
+    fig, ax = plt.subplots(figsize=(4.6, 4.2))
+    ax.plot(fpr, tpr, lw=2, label=f"AUC={auc_val:.3f}")
+    ax.plot([0, 1], [0, 1], "--", color="gray")
+
+    if threshold_markers:
+        for m in threshold_markers:
+            thr = m["thr"]
+            y_pred = (np.asarray(y_prob) >= thr).astype(int)
+            cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
+            tn, fp, fn, tp = cm.ravel()
+            m_tpr = tp / (tp + fn + 1e-12)
+            m_fpr = fp / (fp + tn + 1e-12)
+            ax.scatter([m_fpr], [m_tpr], s=30, marker="o",
+                       label=m.get("label", f"thr={thr:.3f}"))
+
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.set_title(title)
+    ax.legend(loc="lower right")
+    fig.tight_layout()
+    return fig
+
+
+def plot_calibration_curve(y_true, y_prob, title="Calibration Curve", n_bins=10):
+    """Plot calibration curve. Returns matplotlib Figure."""
+    import matplotlib.pyplot as plt
+    from sklearn.calibration import calibration_curve as _cal_curve
+    from sklearn.metrics import brier_score_loss
+
+    prob_true, prob_pred = _cal_curve(y_true, y_prob, n_bins=n_bins)
+    brier = brier_score_loss(y_true, y_prob)
+
+    fig, ax = plt.subplots(figsize=(4.6, 4.2))
+    ax.plot(prob_pred, prob_true, marker="o")
+    ax.plot([0, 1], [0, 1], "--", color="gray")
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("Observed")
+    ax.set_title(f"{title}\nBrier={brier:.3f}")
+    fig.tight_layout()
+    return fig
+
+
+def plot_dca(y_true, y_prob, title="Decision Curve Analysis"):
+    """Plot Decision Curve Analysis. Returns matplotlib Figure."""
+    import matplotlib.pyplot as plt
+
+    dca_df = decision_curve(y_true, y_prob)
+    prev = np.asarray(y_true).mean()
+    treat_all = dca_df["threshold"].apply(
+        lambda th: prev - (1 - prev) * (th / (1 - th))
+    )
+
+    fig, ax = plt.subplots(figsize=(4.6, 4.2))
+    ax.plot(dca_df["threshold"], dca_df["net_benefit"], lw=2, label="Model")
+    ax.plot(dca_df["threshold"], treat_all, "--", label="Treat-all")
+    ax.axhline(0, linestyle="--", color="gray", label="Treat-none")
+    ax.set_xlabel("Threshold")
+    ax.set_ylabel("Net benefit")
+    ax.set_title(title)
+    ax.legend()
+    fig.tight_layout()
+    return fig

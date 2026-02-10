@@ -1,0 +1,73 @@
+# ── Experiment Configuration ──
+# Override any value; unspecified keys use built-in defaults from src/config.py.
+
+# paths:
+#   project_root: /path/to/PSY_ER_prediciton
+#   data_raw_dir: /path/to/data/raw
+#   data_imp_dir: /path/to/data/processed_imp
+#   results_dir: /path/to/results/new_analysis
+#   llm_dir: /path/to/LLM/LLM_FE/data/LLM_output
+
+seeds:
+  split: 123
+  model: 42
+
+labels:
+  - label_30d
+  - label_60d
+  - label_90d
+  - label_180d
+  - label_365d
+
+models_to_run:
+  - LR
+  - RF
+  - XGB
+  - LGBM
+  - CatBoost
+
+split:
+  test_size: 0.3
+
+imputation:
+  methods:
+    - simple
+    - missforest
+    - mice
+    - hybrid
+  missing_threshold: 0.60
+  corr_threshold: 0.70
+  hybrid_threshold: 0.30
+
+feature_selection:
+  core_n: 20
+  final_n: 20
+  top_n_for_core: 30
+
+stage1:
+  outer_cv: 5
+  inner_cv: 3
+  n_iter: 10
+
+stage2:
+  outer_cv: 5
+  inner_cv: 3
+  n_iter: 50
+  best_combos:
+    label_30d:  { model: RF, feature_set: All_Features }
+    label_60d:  { model: RF, feature_set: All_Features }
+    label_90d:  { model: RF, feature_set: All_Features }
+    label_180d: { model: RF, feature_set: All_Features }
+    label_365d: { model: RF, feature_set: All_Features }
+
+clustering:
+  umap_n_components: 2
+  umap_n_neighbors: 45
+  umap_min_dist: 0.0
+  umap_metric: euclidean
+  dbscan_min_samples: 17
+  dbscan_eps: null
+  dbscan_metric: euclidean
+  target_min_clusters: 3
+  max_noise_ratio: 0.45
+  max_trials: 5

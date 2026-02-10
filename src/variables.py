@@ -68,6 +68,26 @@ TARGET_COLS = ["label_30d", "label_60d", "label_90d", "label_180d", "label_365d"
 # ── ID columns (dropped before modeling) ──
 ID_COLS = ["환자번호"]
 
+# ── LLM feature → friendly alias mapping (for display/clustering) ──
+LLM_ALIAS = {
+    "Impaired_Social_Function": "Social Function Impairment (LLM)",
+    "Religious_Affiliation": "Religious Affiliation (LLM)",
+    "Violence_and_Impulsivity": "Aggression/Impulsivity (LLM)",
+    "Domestic_Violence": "Domestic Violence (LLM)",
+    "Physical_Abuse": "Physical Abuse (LLM)",
+    "Divorce": "Divorce Experience (LLM)",
+    "Death_of_Family_Member": "Family Loss (LLM)",
+    "Emotional_Abuse": "Emotional Abuse (LLM)",
+    "Lack_of_Family_Support": "Lack of Family Support (LLM)",
+    "Social_Isolation_and_Lack_of_Support": "Social Isolation (LLM)",
+    "Psychotic_Symptoms": "Halluc/Delusion/Paranoia (LLM)",
+    "Interpersonal_Conflict": "Interpersonal Conflict (LLM)",
+    "Exposure_to_Suicide": "Suicide Exposure (LLM)",
+    "Alcohol_Use_Problems": "Alcohol Use Issues (LLM)",
+    "Sexual_Abuse": "Sexual Victimization (LLM)",
+    "Physical_and_Emotional_Neglect": "Neglect (LLM)",
+}
+
 # ── Korean → English category mapping (LLM preprocessing) ──
 CATEGORY_MAP = {
     "사회기능 저하": "Impaired_Social_Function",

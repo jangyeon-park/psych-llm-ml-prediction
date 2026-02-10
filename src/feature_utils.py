@@ -249,3 +249,30 @@ def prettify_names(raw_names: list, mapping: dict) -> list:
 def to_bayes_space(grid_dict):
     """Convert a grid dict (dict of lists) to BayesSearchCV Categorical spaces."""
     return {k: Categorical(v) for k, v in grid_dict.items()}
+
+
+# ─── Column Harmonization ───
+
+def harmonize_columns_for_pipeline(X, pipeline):
+    """Reorder/pad DataFrame columns to match pipeline preprocessor expectations."""
+    try:
+        expected_cols = pipeline.named_steps["preprocessor"].feature_names_in_
+    except AttributeError:
+        return X
+    X = X.copy()
+    for col in expected_cols:
+        if col not in X.columns:
+            X[col] = 0
+    return X[expected_cols]
+
+
+def harmonize_with_alias(X, pipeline, alias_map=None, fill_value=0):
+    """Map alias column names back to raw keys, then harmonize column order."""
+    if alias_map is None:
+        from .variables import LLM_ALIAS
+        alias_map = LLM_ALIAS
+    X = X.copy()
+    for raw_key, pretty_name in alias_map.items():
+        if (raw_key not in X.columns) and (pretty_name in X.columns):
+            X[raw_key] = X[pretty_name]
+    return harmonize_columns_for_pipeline(X, pipeline)
